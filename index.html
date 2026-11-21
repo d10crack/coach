@@ -1,0 +1,813 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0e13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Coach">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Coach</title>
+<style>
+:root{--bg:#0a0e13;--card:#121a23;--card2:#18222e;--line:#243140;--tx:#e6edf3;--mut:#8b9bb0;--dim:#5b6b80;
+--swim:#38bdf8;--bike:#f59e0b;--run:#22c55e;--str:#a78bfa;--oth:#64748b;--go:#22c55e;--watch:#f59e0b;--swap:#ef4444;--stale:#64748b;
+--z1:#64748b;--z2:#38bdf8;--z3:#22c55e;--z4:#f59e0b;--z5:#ef4444;--z6:#d946ef}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+html{overscroll-behavior-y:none;-webkit-text-size-adjust:100%}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+body{-webkit-user-select:none;user-select:none;touch-action:pan-y}
+input,textarea,.sel,.sel *{-webkit-user-select:text;user-select:text}
+body{padding:env(safe-area-inset-top) 0 calc(70px + env(safe-area-inset-bottom))}
+header{position:sticky;top:0;z-index:5;background:rgba(10,14,19,.92);backdrop-filter:blur(10px);padding:10px 14px 8px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+header h1{font-size:17px;margin:0;letter-spacing:.3px}header>div{min-width:0}
+header .sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header button.icon{background:var(--card2);border:1px solid var(--line);color:var(--mut);border-radius:11px;width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;padding:0;transition:transform .12s,color .12s}
+header button.icon svg{width:19px;height:19px}
+header button.icon:active{transform:scale(.9)}
+header button.icon.on{color:var(--swim);border-color:#2a4a63}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;background:var(--card2);color:var(--mut);white-space:nowrap}
+main{max-width:860px;margin:0 auto;padding:10px 12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--mut);margin:0 0 8px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h3{font-size:15px;margin:0 0 4px}
+.grid{display:grid;gap:10px}.grid>*{min-width:0}svg{max-width:100%}html,body{overflow-x:hidden}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(min-width:700px){.wide2{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--card2);border-radius:10px;padding:8px 10px}
+.kpi .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.kpi .v{font-size:20px;font-weight:700;margin-top:2px}
+.kpi .s{font-size:11px;color:var(--dim)}
+.mut{color:var(--mut)}.dim{color:var(--dim)}.small{font-size:12px}.tiny{font-size:11px}
+.row{display:flex;gap:8px;align-items:center}.between{justify-content:space-between}.wrap{flex-wrap:wrap}
+.verdict{border-radius:16px;padding:14px 16px;margin:10px 0;border:1px solid}
+.verdict .t{font-size:20px;font-weight:800;line-height:1.2}
+.verdict.GO{background:linear-gradient(135deg,#0f2a1a,#121a23);border-color:#1f6b3a}
+.verdict.WATCH{background:linear-gradient(135deg,#2e2208,#121a23);border-color:#7a5a12}
+.verdict.SWAP{background:linear-gradient(135deg,#2e0f0f,#121a23);border-color:#7f1d1d}
+.verdict.STALE{background:linear-gradient(135deg,#1a2230,#121a23);border-color:#334155}
+.sig{background:var(--card2);border-radius:12px;padding:8px 10px;border-left:4px solid var(--go)}
+.sig.bad{border-left-color:var(--swap)}
+.sig .n{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.sig .v{font-size:19px;font-weight:700}
+.sess{border-radius:12px;background:var(--card2);padding:10px 12px;margin:8px 0;border-left:5px solid var(--oth)}
+.sess .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.sess .ti{font-weight:700}
+.tag{display:inline-block;font-size:12px;padding:3px 8px;border-radius:8px;margin:4px 4px 0 0;background:#0d141c;border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.badge{font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;letter-spacing:.5px}
+.KEY{background:#7f1d1d;color:#fecaca}.CORE{background:#1e3a5f;color:#bfdbfe}.OPT{background:#334155;color:#cbd5e1}.TEST{background:#5b21b6;color:#ede9fe}.RACE{background:#a16207;color:#fef3c7}.REST{background:#1f2937;color:#9ca3af}
+details summary{cursor:pointer;color:var(--mut);font-size:12px;margin-top:6px}
+details[open] summary{margin-bottom:4px}
+.rx{font-size:13px;color:#c9d4df;white-space:pre-wrap}
+.adv{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.adv:first-child{border-top:0}
+.adv .dot{width:8px;height:8px;border-radius:50%;margin-top:7px;flex:none;background:var(--swim)}
+.adv .src{font-size:11px;color:var(--dim);margin-top:2px}
+.flag{display:flex;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.flag:first-child{border-top:0}
+.flag .b{width:6px;border-radius:3px;flex:none}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:rgba(14,19,26,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:4px 2px calc(4px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;color:var(--dim);font:600 10px/1.2 inherit;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button svg{width:22px;height:22px}
+nav button{position:relative;transition:transform .12s ease,color .15s ease}
+nav button:active{transform:scale(.88)}
+nav button.on{color:var(--tx)}
+nav button.on svg{stroke:var(--swim)}
+nav button.on::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:3px;border-radius:0 0 3px 3px;background:var(--swim)}
+.seg{display:inline-flex;background:var(--card2);border-radius:9px;padding:2px}
+.seg button{background:none;border:0;color:var(--mut);font:600 12px inherit;padding:5px 10px;border-radius:7px}
+.seg button.on{background:#2a3a4d;color:var(--tx)}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{font-size:11px;color:var(--mut);text-align:left;font-weight:600;padding:5px 4px;border-bottom:1px solid var(--line)}
+td{padding:6px 4px;border-bottom:1px solid #1b2531}
+.zb{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+svg text{font-family:inherit}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mut);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.conf{font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px}
+.HIGH,.MED-HIGH{background:#14532d;color:#bbf7d0}.MED{background:#1e3a5f;color:#bfdbfe}.LOW-MED,.LOW{background:#713f12;color:#fde68a}
+input,select{background:#0d141c;border:1px solid var(--line);color:var(--tx);border-radius:8px;padding:7px 9px;font:inherit;width:100%}
+button.btn{background:#1d4ed8;border:0;color:#fff;font:600 14px inherit;padding:11px 16px;border-radius:12px;transition:transform .12s,filter .12s}
+button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line);font:600 13px inherit;padding:9px 13px;border-radius:11px;transition:transform .12s,filter .12s}
+button.btn:active,button.ghost:active,.seg button:active{transform:scale(.96);filter:brightness(.86)}
+button.btn:disabled,button.ghost:disabled{opacity:.5}
+button.danger{background:#3b1518;color:#fca5a5;border-color:#7f1d1d}
+.ok{color:#86efac}.warnc{color:#fcd34d}
+.week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.day{min-width:0;background:var(--card2);border-radius:8px;padding:4px 3px;min-height:74px;font-size:11px}
+.day.today{outline:2px solid var(--swim)}
+.day .dn{color:var(--mut);font-weight:700;font-size:10px}
+.chip{overflow-wrap:anywhere;hyphens:auto;border-radius:5px;padding:2px 3px;margin-top:3px;font-size:9px;line-height:1.2;color:#0a0e13;font-weight:600}
+.ckey{box-shadow:inset 0 -3px 0 #b91c1c}
+.st-done{opacity:1}.st-missed{opacity:.45;text-decoration:line-through}.st-short{opacity:.8}.st-swapped{opacity:.6}.st-nodata{opacity:.7;outline:1px dashed #64748b}
+.act{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:center}
+.act:first-child{border-top:0}
+.ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;font-size:12px;font-weight:800;color:#0a0e13}
+.lock{max-width:380px;margin:12vh auto;padding:20px}
+/* --- app feel: view transition, pull to refresh, toast, install hint --- */
+@keyframes vin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+main.anim{animation:vin .2s cubic-bezier(.2,.8,.2,1)}
+#ptr{position:fixed;left:0;right:0;top:0;z-index:7;display:flex;align-items:flex-end;justify-content:center;height:0;overflow:hidden;pointer-events:none;color:var(--mut)}
+#ptr div{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding-bottom:6px}
+#ptr svg{width:17px;height:17px;transition:transform .2s}
+#ptr.spin svg{animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(84px + env(safe-area-inset-bottom));z-index:9;background:#1f2b3a;border:1px solid var(--line);color:var(--tx);font-size:13px;font-weight:600;padding:10px 16px;border-radius:99px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%)}
+#a2hs{margin:10px 12px 0;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--mut);display:flex;gap:10px;align-items:center}
+.sk{background:linear-gradient(90deg,#141d27,#1b2734,#141d27);background-size:200% 100%;animation:shim 1.2s linear infinite;border-radius:10px;height:14px;margin:9px 0}
+@keyframes shim{to{background-position:-200% 0}}
+.set label{display:block;font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px}
+.set .hint{font-size:11px;color:var(--dim);margin-top:5px}
+.dotst{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block;vertical-align:0}
+.err{color:#fca5a5;font-size:13px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header><div style="flex:1"><h1>Coach</h1><div class="sub" id="hsub">loading</div></div><span class="pill" id="hpill"></span>
+<button class="icon" id="gear" title="Settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 01-2.8 2.8l-.1-.1a1.7 1.7 0 00-2.9 1.2v.2a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.6 1.7 1.7 0 00-1.9.4l-.1.1a2 2 0 01-2.8-2.8l.1-.1a1.7 1.7 0 00-1.2-2.9H3a2 2 0 010-4h.2A1.7 1.7 0 004.6 7l-.1-.1a2 2 0 012.8-2.8l.1.1A1.7 1.7 0 0010 4.6V3a2 2 0 014 0v.2a1.7 1.7 0 002.9 1.2l.1-.1a2 2 0 012.8 2.8l-.1.1A1.7 1.7 0 0021 10.9h.1a2 2 0 010 4h-.2a1.7 1.7 0 00-1.5 1.1z"/></svg></button></header>
+<div id="ptr"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 11-6.2-8.6"/><path d="M21 3v6h-6"/></svg><span id="ptrtx">Pull to refresh</span></div></div>
+<main id="app"><div class="card"><div class="sk" style="width:45%"></div><div class="sk"></div><div class="sk" style="width:80%"></div></div><div class="card"><div class="sk" style="width:30%"></div><div class="sk" style="height:60px"></div></div></main>
+<div id="toast"></div>
+<nav id="nav"></nav>
+<!--LOCAL-->
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const r0=x=>x==null?null:Math.round(x);
+const mmss=s=>{if(s==null||isNaN(s))return'--';s=Math.round(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const hms=s=>{if(s==null||isNaN(s))return'--';s=Math.round(s);return Math.floor(s/3600)+':'+String(Math.floor(s%3600/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const hm=s=>{if(s==null)return'--';s=Math.round(s/60);return s>=60?Math.floor(s/60)+'h'+String(s%60).padStart(2,'0'):s+"'"};
+const D=s=>new Date(s+'T12:00:00');
+const iso=d=>d.toISOString().slice(0,10);
+const addD=(s,n)=>{const d=D(s);d.setDate(d.getDate()+n);return iso(d)};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WD=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const fd=s=>{const d=D(s);return d.getDate()+' '+MON[d.getMonth()]};
+const fdw=s=>{const d=D(s);return WD[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()]};
+const SP={swim:['var(--swim)','SW'],bike:['var(--bike)','BK'],run:['var(--run)','RN'],strength:['var(--str)','ST'],multi:['#f472b6','TRI'],other:['var(--oth)','..']};
+const PSP={Swim:'swim',Bike:'bike',Run:'run',Brick:'run',Strength:'strength',Triathlon:'multi',Other:'other',Rest:'other'};
+const AIC=a=>({walking:'WK',hiking:'HK',soccer:'FB',breathwork:'BR',pilates:'PI',hiit:'HI',transition_v2:'T'})[a.type]||(SP[a.sport]||SP.other)[1];
+const spc=s=>(SP[s]||SP.other)[0];
+const ZC=['var(--z1)','var(--z2)','var(--z3)','var(--z4)','var(--z5)','var(--z6)','#f0abfc'];
+let P=null, TAB=(location.hash||'').slice(1)||localStorage.getItem('coachTab')||'today', TH=null;
+
+/* ---------- data: embedded (PC copy) or encrypted file (phone) ---------- */
+const b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const ub64=a=>btoa(String.fromCharCode(...new Uint8Array(a)));
+async function deriveKey(pass,box){
+  const base=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveBits']);
+  const bits=await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:new TextEncoder().encode(box.salt),iterations:box.rounds},base,256);
+  return ub64(bits);
+}
+async function openBox(box,kb64){
+  const key=await crypto.subtle.importKey('raw',b64(kb64),'AES-GCM',false,['decrypt']);
+  let raw=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(box.iv)},key,b64(box.ct));
+  if(box.gz){const s=new Blob([raw]).stream().pipeThrough(new DecompressionStream('gzip'));raw=await new Response(s).arrayBuffer()}
+  return JSON.parse(new TextDecoder().decode(raw));
+}
+async function boot(){
+  if(window.COACH_DATA){P=window.COACH_DATA;return start()}
+  let box;
+  try{box=await (await fetch('coach.enc.json?t='+Date.now(),{cache:'no-store'})).json()}
+  catch(e){try{box=await (await fetch('coach.enc.json')).json()}catch(e2){return lockScreen('Could not load the data file (offline and nothing cached yet).')}}
+  if(box&&box.salt)BOXMETA={salt:box.salt,rounds:box.rounds};
+  const k=localStorage.getItem('coachKey');
+  if(k){try{P=await openBox(box,k);return start()}catch(e){localStorage.removeItem('coachKey')}}
+  lockScreen('',box);
+}
+function lockScreen(msg,box){
+  $('#hsub').textContent='locked';
+  $('#app').innerHTML=`<div class="lock card"><h3>Private training data</h3><p class="mut small">The file on this site is encrypted. Type your passphrase once; this phone keeps the key, never the passphrase.</p>
+  <input id="pw" type="password" autocomplete="current-password" placeholder="Passphrase"><div style="height:10px"></div>
+  <button class="btn" id="go" ${box?'':'disabled'}>Open</button><p class="err" id="perr">${esc(msg)}</p></div>`;
+  const go=async()=>{$('#perr').textContent='Unlocking (a second or two)...';
+    try{const k=await deriveKey($('#pw').value.trim(),box);P=await openBox(box,k);localStorage.setItem('coachKey',k);start()}
+    catch(e){$('#perr').textContent='Wrong passphrase, or the file changed while loading. Try again.'}};
+  $('#go').onclick=go;$('#pw').onkeydown=e=>{if(e.key==='Enter')go()};
+}
+
+/* ---------- thresholds: the payload's, plus test results typed on this phone ---------- */
+function loadTH(){
+  TH=JSON.parse(JSON.stringify(P.th));
+  const ov=JSON.parse(localStorage.getItem('coachOv')||'{}');
+  for(const k in ov){if(ov[k]&&ov[k].v){TH[k]=Object.assign({},TH[k]||{},ov[k],{conf:'HIGH',local:true})}}
+}
+const tv=k=>(TH[k]||{}).v;
+function zoneTables(){
+  const M=P.model,t={};
+  if(tv('run_pace'))t.run_pace=M.run_pace.map(([n,a,b])=>[n,tv('run_pace')*a,tv('run_pace')*b]);
+  if(tv('run_lthr'))t.run_hr=M.run_hr.map(([n,a,b])=>[n,tv('run_lthr')*a,tv('run_lthr')*b]);
+  if(tv('bike_ftp'))t.bike_w=M.bike_w.map(([n,a,b])=>[n,tv('bike_ftp')*a,tv('bike_ftp')*b]);
+  if(tv('bike_lthr'))t.bike_hr=M.bike_hr.map(([n,a,b])=>[n,tv('bike_lthr')*a,tv('bike_lthr')*b]);
+  if(tv('swim_css'))t.swim=M.swim.map(([n,a,b])=>[n,tv('swim_css')+a,tv('swim_css')+b]);
+  return t;
+}
+/* same logic as engine.targets(): plan zone label -> his numbers */
+function targets(sport,zone){
+  zone=zone||'';const M=P.model,out=[];
+  const f=[...zone.matchAll(/Z([1-6])([abc]?)/g)].map(m=>+m[1]);
+  let lo=f.length?Math.min(...f):null,hi=f.length?Math.max(...f):null;
+  const pick=(T,a,b)=>[T[Math.min(a,T.length)-1],T[Math.min(b,T.length)-1]];
+  if((sport==='Run'||sport==='Brick')&&lo){
+    if(tv('run_lthr')&&!zone.includes('short')){const[z1,z2]=pick(M.run_hr,lo,hi);out.push(`HR ${r0(tv('run_lthr')*z1[1])}-${r0(tv('run_lthr')*z2[2])}`)}
+    if(tv('run_pace')){const[z1,z2]=pick(M.run_pace,lo,hi);out.push(`pace ${mmss(tv('run_pace')*z2[1])}-${mmss(tv('run_pace')*z1[2])}/km`)}
+  }
+  if((sport==='Run'||sport==='Brick')&&zone.includes('70.3')&&tv('run_pace')){const[a,b]=M.race.run_703;out.push(`70.3 pace ${mmss(tv('run_pace')*a)}-${mmss(tv('run_pace')*b)}/km`)}
+  if(sport==='Bike'){
+    if(zone.includes('SST')){lo=hi=null;
+      if(tv('bike_ftp'))out.push(`${r0(tv('bike_ftp')*.88)}-${r0(tv('bike_ftp')*.93)} W`);
+      if(tv('bike_lthr'))out.push(`HR ${r0(tv('bike_lthr')*.94)}-${r0(tv('bike_lthr')*.97)}`)}
+    if(lo){
+      if(tv('bike_lthr')){const[z1,z2]=pick(M.bike_hr,lo,hi);out.push(`HR ${r0(tv('bike_lthr')*z1[1])}-${r0(tv('bike_lthr')*z2[2])}`)}
+      if(tv('bike_ftp')){const T=[0,1,2,4,5,6].map(i=>M.bike_w[i]);const[z1,z2]=pick(T,lo,hi);out.push(`${r0(tv('bike_ftp')*z1[1])}-${r0(tv('bike_ftp')*z2[2])} W indoors`)}
+    }
+    if(zone.includes('70.3')){
+      if(tv('bike_ftp')){const[a,b]=M.race.bike_703_valencia;out.push(`70.3 ${r0(tv('bike_ftp')*a)}-${r0(tv('bike_ftp')*b)} W`)}
+      if(tv('bike_lthr')){const[a,b]=M.race.bike_hr_703;out.push(`70.3 HR ${r0(tv('bike_lthr')*a)}-${r0(tv('bike_lthr')*b)}`)}
+    }
+  }
+  if(sport==='Swim'&&tv('swim_css')){
+    if(lo){const z1=M.swim[Math.min(hi,5)-1],z2=M.swim[Math.min(lo,5)-1];out.push(`${mmss(tv('swim_css')+z1[1])}-${mmss(tv('swim_css')+z2[2])}/100 m`)}
+    if(zone.includes('CSS'))out.push(`CSS ${mmss(tv('swim_css'))}/100 m`);
+  }
+  return out;
+}
+
+/* ---------- navigation ---------- */
+const ICO={today:'<path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="4"/>',
+zones:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',load:'<path d="M3 17l5-6 4 3 6-8 3 3"/>',
+recovery:'<path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 00-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 000-7.8z"/>',
+races:'<path d="M4 22V4M4 4h13l-2 4 2 4H4"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',
+log:'<path d="M4 6h16M4 12h16M4 18h10"/>'};
+const TABS=[['today','Today'],['zones','Zones'],['load','Load'],['recovery','Recovery'],['races','Races'],['plan','Plan'],['log','Log']];
+function nav(){
+  $('#nav').innerHTML=TABS.map(([k,l])=>`<button class="${k===TAB?'on':''}" data-t="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICO[k]}</svg>${l}</button>`).join('');
+  document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.t));
+  $('#gear').classList.toggle('on',TAB==='set');
+}
+/* one place to change tab: remembers where you were on each one */
+const SCROLL={};
+function go(tab,keepScroll){
+  if(tab===TAB)return;
+  SCROLL[TAB]=window.scrollY; TAB=tab;
+  if(tab!=='set')localStorage.setItem('coachTab',tab);
+  render(); buzz(4);
+  const y=keepScroll?(SCROLL[tab]||0):0;
+  requestAnimationFrame(()=>window.scrollTo(0,y));
+}
+const buzz=ms=>{try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}};   // Android only; iOS ignores it
+let TOASTT=null;
+function toast(msg,ms){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(TOASTT);TOASTT=setTimeout(()=>t.classList.remove('on'),ms||2600)}
+function swipeable(){
+  let x0=null,y0=null,t0=0;
+  const main=$('#app');
+  main.addEventListener('touchstart',e=>{if(e.touches.length!==1){x0=null;return}x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()},{passive:true});
+  main.addEventListener('touchend',e=>{
+    if(x0==null||TAB==='set')return;
+    const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;
+    x0=null;
+    if(Math.abs(dx)<65||Math.abs(dy)>45||Date.now()-t0>600)return;
+    const i=TABS.findIndex(([k])=>k===TAB),j=i+(dx<0?1:-1);
+    if(j>=0&&j<TABS.length)go(TABS[j][0],true);
+  },{passive:true});
+}
+/* pull down at the top of the page to fetch a fresh build */
+function pullToRefresh(){
+  const el=$('#ptr'),tx=$('#ptrtx');let y0=null,pull=0,busy=false;
+  const set=h=>{el.style.height=Math.min(h,78)+'px'};
+  document.addEventListener('touchstart',e=>{if(busy||window.scrollY>0||e.touches.length!==1){y0=null;return}y0=e.touches[0].clientY;pull=0},{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(y0==null||busy)return;
+    pull=e.touches[0].clientY-y0;
+    if(pull<=0){set(0);return}
+    set(pull*0.55); tx.textContent=pull>95?'Release to refresh':'Pull to refresh';
+  },{passive:true});
+  document.addEventListener('touchend',async()=>{
+    if(y0==null||busy){set(0);return}
+    const fire=pull>95; y0=null;
+    if(!fire){set(0);return}
+    busy=true;el.classList.add('spin');set(44);tx.textContent='Refreshing...';buzz(12);
+    await refresh(true);
+    el.classList.remove('spin');set(0);busy=false;
+  },{passive:true});
+}
+/* re-read the encrypted file without losing the unlocked key */
+async function refresh(quiet){
+  if(window.COACH_DATA){location.reload();return true}
+  const k=localStorage.getItem('coachKey');
+  if(!k){lockScreen('');return false}
+  try{
+    const box=await (await fetch('coach.enc.json?t='+Date.now(),{cache:'no-store'})).json();
+    const np=await openBox(box,k);
+    const changed=np.built!==(P&&P.built);
+    P=np;start();
+    if(!quiet||changed)toast(changed?'Updated: built '+P.built.slice(11,16):'Already the newest build');
+    return true;
+  }catch(e){toast(navigator.onLine?'Could not refresh: '+e.message:'Offline: showing the last data');return false}
+}
+function netPill(){
+  const off=!navigator.onLine;
+  $('#hpill').style.color=off?'#fcd34d':'';
+  if(off)$('#hpill').textContent='offline';else if(P)$('#hpill').textContent='data to '+fd(P.horizon);
+}
+function start(){
+  loadTH();
+  $('#gear').onclick=()=>go(TAB==='set'?(localStorage.getItem('coachTab')||'today'):'set');
+  const age=(Date.now()-new Date(P.built).getTime())/3.6e6;
+  $('#hsub').textContent=`${fdw(P.today)} | built ${P.built.slice(11,16)}${age>3?' ('+Math.round(age)+' h ago)':''}`;
+  $('#hpill').textContent='data to '+fd(P.horizon);
+  netPill();
+  render();
+}
+function render(){nav();const f={today:vToday,zones:vZones,load:vLoad,recovery:vRec,races:vRaces,plan:vPlan,log:vLog,set:vSet}[TAB]||vToday;
+  const m=$('#app');
+  try{m.innerHTML=f();(AFTER[TAB]||(()=>{}))()}catch(e){m.innerHTML=`<div class="card err">This view failed: ${esc(e.message)}</div>`;console.error(e)}
+  m.classList.remove('anim');void m.offsetWidth;m.classList.add('anim');}
+const AFTER={};
+
+/* ---------- hand-built SVG charts ---------- */
+function stepTicks(a,b,st){const t=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)t.push(v);return t}
+function niceTicks(a,b,n){if(a===b){a-=1;b+=1}const s=(b-a)/n,p=Math.pow(10,Math.floor(Math.log10(s))),m=s/p,st=(m<1.5?1:m<3?2:m<7?5:10)*p;const t=[];for(let v=Math.ceil(a/st)*st;v<=b+1e-9;v+=st)t.push(+v.toFixed(6));return t}
+function xTicks(x,fmt){const n=x.length,out=[];if(!n)return out;const span=n;
+  if(span>400){x.forEach((d,i)=>{if(d&&d.slice(5,10)==='01-01'||d&&['04','07','10'].includes(d.slice(5,7))&&d.slice(8,10)==='01')out.push([i,d.slice(8)==='01'&&d.slice(5,7)==='01'?d.slice(0,4):MON[+d.slice(5,7)-1]])})}
+  else if(span>75){x.forEach((d,i)=>{if(d&&d.slice(8,10)==='01')out.push([i,MON[+d.slice(5,7)-1]])})}
+  else{const st=Math.max(1,Math.round(n/5));for(let i=0;i<n;i+=st)out.push([i,(fmt||fd)(x[i])])}
+  return out}
+const anc=(x,W)=>x<22?'start':x>W-22?'end':'middle';
+function chart(o){
+  const W=o.w||360,H=o.h||150,L=o.L??32,R=6,T=8,B=18,n=o.x.length;
+  const vals=[];(o.lines||[]).forEach(l=>l.v.forEach(v=>v!=null&&vals.push(v)));
+  if(o.band){o.band.lo.forEach(v=>v!=null&&vals.push(v));o.band.hi.forEach(v=>v!=null&&vals.push(v))}
+  (o.bars||[]).forEach(b=>b.v.forEach(v=>v!=null&&vals.push(v)));(o.refs||[]).forEach(r=>vals.push(r.y));
+  if(!vals.length)return'<div class="mut small">No data</div>';
+  let a=o.ymin??Math.min(...vals),b=o.ymax??Math.max(...vals);const pd=(b-a)*.06||1;if(o.ymin==null)a-=pd;if(o.ymax==null)b+=pd;
+  if(o.zero&&a>0)a=0;
+  const X=i=>L+(n<2?0:i*(W-L-R)/(n-1)),Y=v=>o.invert?T+(v-a)*(H-T-B)/(b-a):H-B-(v-a)*(H-T-B)/(b-a);
+  const yf=o.yfmt||(v=>Math.abs(v)>=100?Math.round(v):+v.toFixed(1));
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">`;
+  (o.tstep?stepTicks(a,b,o.tstep):niceTicks(a,b,4)).forEach(t=>{const y=Y(t);if(y<T-1||y>H-B+1)return;s+=`<line x1="${L}" x2="${W-R}" y1="${y}" y2="${y}" stroke="#1f2b38"/><text x="${L-4}" y="${y+3}" fill="#5b6b80" font-size="9" text-anchor="end">${yf(t)}</text>`});
+  xTicks(o.x,o.xfmt).filter(([i,l])=>W>=250||/^\d{4}$/.test(l)).forEach(([i,l])=>{s+=`<line x1="${X(i)}" x2="${X(i)}" y1="${T}" y2="${H-B}" stroke="#16202b"/><text x="${X(i)}" y="${H-5}" fill="#5b6b80" font-size="9" text-anchor="${anc(X(i),W)}">${l}</text>`});
+  if(o.band){let up='',dn='';o.band.hi.forEach((v,i)=>{if(v!=null)up+=(up?'L':'M')+X(i)+' '+Y(v)});
+    for(let i=n-1;i>=0;i--){const v=o.band.lo[i];if(v!=null)dn+='L'+X(i)+' '+Y(v)}
+    if(up)s+=`<path d="${up}${dn}Z" fill="${o.band.c||'#22c55e'}" opacity=".13"/>`}
+  (o.bars||[]).forEach(bb=>{const bw=Math.max(1,(W-L-R)/n*.7);bb.v.forEach((v,i)=>{if(v==null||!v)return;const y0=Y(Math.max(a,0)),y=Y(v);
+    s+=`<rect x="${X(i)-bw/2}" y="${Math.min(y,y0)}" width="${bw}" height="${Math.abs(y0-y)}" fill="${typeof bb.c==='function'?bb.c(v,i):bb.c}" opacity="${bb.o||.8}"/>`})});
+  (o.refs||[]).forEach(r=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(r.y)}" y2="${Y(r.y)}" stroke="${r.c}" stroke-dasharray="3 3"/>${r.t?`<text x="${W-R-2}" y="${Y(r.y)-3}" fill="${r.c}" font-size="9" text-anchor="end">${r.t}</text>`:''}`});
+  (o.lines||[]).forEach(l=>{let d='',pen=false;l.v.forEach((v,i)=>{if(v==null){if(!l.join)pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);pen=true});
+    if(l.area&&d)s+=`<path d="${d}L${X(n-1)} ${Y(Math.max(a,0))}L${X(0)} ${Y(Math.max(a,0))}Z" fill="${l.c}" opacity=".12"/>`;
+    s+=`<path d="${d}" fill="none" stroke="${l.c}" stroke-width="${l.w||1.6}" ${l.dash?`stroke-dasharray="${l.dash}"`:''} stroke-linejoin="round" stroke-linecap="round"/>`;
+    if(l.dots)l.v.forEach((v,i)=>{if(v!=null)s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${l.dots}" fill="${l.c}"/>`});
+    if(l.lastLabel){let i=n-1;while(i>0&&l.v[i]==null)i--;if(l.v[i]!=null)s+=`<circle cx="${X(i)}" cy="${Y(l.v[i])}" r="3" fill="${l.c}"/>`}});
+  return s+'</svg>';
+}
+function stack(o){
+  const W=o.w||360,H=o.h||170,L=28,R=6,T=8,B=18,n=o.x.length;
+  const tot=o.x.map((_,i)=>o.stacks.reduce((s,k)=>s+(k.v[i]||0),0));
+  const mx=Math.max(...tot,...(o.line?o.line.v.filter(v=>v!=null):[]),1)*1.08;
+  const X=i=>L+(i+.5)*(W-L-R)/n,Y=v=>H-B-v*(H-T-B)/mx,bw=(W-L-R)/n*.72;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">`;
+  niceTicks(0,mx,4).forEach(t=>{s+=`<line x1="${L}" x2="${W-R}" y1="${Y(t)}" y2="${Y(t)}" stroke="#1f2b38"/><text x="${L-4}" y="${Y(t)+3}" fill="#5b6b80" font-size="9" text-anchor="end">${t}</text>`});
+  o.x.forEach((d,i)=>{let y=H-B;o.stacks.forEach(k=>{const v=k.v[i]||0;if(!v)return;const h=v*(H-T-B)/mx;y-=h;s+=`<rect x="${X(i)-bw/2}" y="${y}" width="${bw}" height="${h}" fill="${k.c}" ${o.hi===i?'':'opacity=".85"'}><title>${fd(d)} ${k.label}: ${v.toFixed(1)}</title></rect>`});
+    if(i%(o.every||4)===0)s+=`<text x="${X(i)}" y="${H-5}" fill="#5b6b80" font-size="9" text-anchor="${anc(X(i),W)}">${fd(d)}</text>`});
+  if(o.line){let p='';o.line.v.forEach((v,i)=>{if(v==null)return;p+=`M${X(i)-bw/2-1} ${Y(v)}L${X(i)+bw/2+1} ${Y(v)}`});s+=`<path d="${p}" stroke="${o.line.c}" stroke-width="2"/>`}
+  return s+'</svg>';
+}
+function spark(v,c,band,w=110,h=30){const xs=v.map((_,i)=>i);const ok=v.filter(x=>x!=null);if(!ok.length)return'';
+  let a=Math.min(...ok,...(band?band.filter(x=>x!=null):[])),b=Math.max(...ok,...(band?band.filter(x=>x!=null):[]));if(a===b){a-=1;b+=1}
+  const X=i=>2+i*(w-4)/Math.max(1,v.length-1),Y=x=>h-3-(x-a)*(h-6)/(b-a);let d='',pen=false;
+  v.forEach((x,i)=>{if(x==null){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(x).toFixed(1);pen=true});
+  let s=`<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" preserveAspectRatio="none">`;
+  if(band&&band.length===2&&band[0]!=null)s+=`<rect x="0" y="${Y(band[1])}" width="${w}" height="${Math.max(1,Y(band[0])-Y(band[1]))}" fill="#22c55e" opacity=".14"/>`;
+  let li=v.length-1;while(li>0&&v[li]==null)li--;
+  return s+`<path d="${d}" fill="none" stroke="${c}" stroke-width="1.6"/><circle cx="${X(li)}" cy="${Y(v[li])}" r="2.5" fill="${c}"/></svg>`}
+function gauge(v,max,c,label,sub){const a=Math.max(0,Math.min(1,(v||0)/max)),R=42,C=Math.PI*R;
+  return `<svg viewBox="0 0 110 66" width="110" height="66"><path d="M13 58A42 42 0 0 1 97 58" fill="none" stroke="#243140" stroke-width="9" stroke-linecap="round"/>
+  <path d="M13 58A42 42 0 0 1 97 58" fill="none" stroke="${c}" stroke-width="9" stroke-linecap="round" stroke-dasharray="${C*a} ${C}"/>
+  <text x="55" y="52" fill="#e6edf3" font-size="20" font-weight="800" text-anchor="middle">${v??'--'}</text><text x="55" y="64" fill="#8b9bb0" font-size="8" text-anchor="middle">${label||''}</text></svg>${sub?`<div class="tiny mut" style="text-align:center">${sub}</div>`:''}`}
+function zoneBar(z,w=120,h=8){const t=(z||[]).reduce((a,b)=>a+(b||0),0);if(!t)return'';let x=0,s=`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="border-radius:4px">`;
+  z.forEach((m,i)=>{const ww=(m||0)/t*w;if(ww>0)s+=`<rect x="${x}" y="0" width="${ww}" height="${h}" fill="${ZC[i]}"/>`;x+=ww});return s+'</svg>'}
+function heat(acts,endIso){const mins={};acts.forEach(a=>{if(['swim','bike','run','strength','multi'].includes(a.sport)&&!(a.multi&&acts.some(b=>b.parent===a.id)))mins[a.d]=(mins[a.d]||0)+(a.mov||0)/60});
+  const end=D(endIso),start=new Date(end);start.setDate(start.getDate()-363-((end.getDay()+6)%7));
+  const cs=9,g=2,W=53*(cs+g)+24,H=7*(cs+g)+16;let s=`<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+  ['M','','W','','F','','S'].forEach((l,i)=>{if(l)s+=`<text x="0" y="${14+i*(cs+g)+7}" fill="#5b6b80" font-size="8">${l}</text>`});
+  const d=new Date(start);let wk=0,lastM=-1;
+  while(d<=end){const k=iso(d),dow=(d.getDay()+6)%7,m=mins[k]||0;
+    const c=m===0?'#16202b':m<30?'#14532d':m<60?'#15803d':m<120?'#22c55e':'#86efac';
+    if(dow===0&&d.getMonth()!==lastM){lastM=d.getMonth();s+=`<text x="${14+wk*(cs+g)}" y="8" fill="#5b6b80" font-size="8">${MON[lastM]}</text>`}
+    s+=`<rect x="${14+wk*(cs+g)}" y="${12+dow*(cs+g)}" width="${cs}" height="${cs}" rx="2" fill="${c}"><title>${k}: ${Math.round(m)}'</title></rect>`;
+    d.setDate(d.getDate()+1);if(dow===6)wk++}
+  return s+'</svg><div class="legend"><span><i style="background:#16202b;height:8px;width:8px"></i>rest</span><span><i style="background:#14532d;height:8px;width:8px"></i>&lt;30\'</span><span><i style="background:#15803d;height:8px;width:8px"></i>30-60\'</span><span><i style="background:#22c55e;height:8px;width:8px"></i>1-2 h</span><span><i style="background:#86efac;height:8px;width:8px"></i>2 h+</span></div>'}
+const seg=(id,opts,cur)=>`<div class="seg" id="${id}">${opts.map(([k,l])=>`<button data-k="${k}" class="${k==cur?'on':''}">${l}</button>`).join('')}</div>`;
+function bindSeg(id,fn){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>fn(b.dataset.k))}
+
+/* ---------- TODAY ---------- */
+const STL={done:['#22c55e','done'],short:['#f59e0b','short'],missed:['#ef4444','missed'],swapped:['#a78bfa','other sport'],today:['#38bdf8','today'],nodata:['#64748b','no data yet']};
+function sessCard(s,open){
+  const sp=PSP[s.sport]||'other',tg=targets(s.sport,s.zone),st=STL[s.st];
+  return `<div class="sess" style="border-left-color:${spc(sp)}"><div class="top"><div><div class="ti">${esc(s.title)}</div>
+  <div class="small mut">${esc(s.sport)}${s.min?' | '+hm(s.min*60):''}${s.zone&&s.zone!=='-'?' | '+esc(s.zone):''}${st&&s.st!=='today'?` | <b style="color:${st[0]}">${st[1]}${s.done?' ('+s.done+"')":''}</b>`:''}</div></div>
+  <span class="badge ${s.pri}">${s.pri}</span></div>
+  ${tg.length?`<div>${tg.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
+  ${s.rx?`<details ${open?'open':''}><summary>Session</summary><div class="rx">${esc(s.rx)}</div>${s.fuel?`<div class="rx" style="margin-top:6px;color:#fcd34d">Fuel: ${esc(s.fuel)}</div>`:''}</details>`:''}</div>`}
+function vToday(){
+  const R=P.rec,v=R.verdict,days=P.days,n=days.d.length,last=k=>days[k].slice(-14);
+  const sg=R.signals,sigCol={hrv:'var(--swim)',rhr:'#f87171',sleep:'#a78bfa'};
+  const bands={hrv:[sg[0].lo,sg[0].hi],rhr:[sg[1].norm-3,sg[1].norm+5],sleep:[7,9]};
+  const val={hrv:sg[0].v!=null?sg[0].v+' ms':'--',rhr:sg[1].v!=null?sg[1].v+' bpm':'--',sleep:sg[2].v!=null?sg[2].v.toFixed(1)+' h':'--'};
+  const sub={hrv:`7d ${sg[0].v7??'--'} | band ${sg[0].lo??'-'}-${sg[0].hi??'-'}`,rhr:`normal ${sg[1].norm??'--'}`,sleep:`score ${sg[2].score??'--'} | 7d ${sg[2].avg7??'--'} h`};
+  const notes=P.advice.filter(a=>!['verdict','today','tomorrow'].includes(a.k));
+  const ts=P.today_s.filter(s=>s.sport!=='Rest'),rest=P.today_s.find(s=>s.sport==='Rest');
+  const nx=P.next.filter(s=>s.d>P.today).slice(0,40),byd={};nx.forEach(s=>(byd[s.d]=byd[s.d]||[]).push(s));
+  const A=P.races.filter(r=>r.days!=null&&r.days>=0).slice(0,8);
+  const rc=['#f87171','#fbbf24','#60a5fa'];
+  return `<div class="verdict ${v.code}"><div class="tiny mut" style="text-transform:uppercase;letter-spacing:.8px">Morning check | ${R.day?fd(R.day)+' night':''}</div>
+   <div class="t">${esc(v.title)}</div><div class="small" style="margin-top:4px">${esc(v.txt)}</div>
+   <div class="grid g3" style="margin-top:10px">${sg.map(s=>`<div class="sig ${s.bad?'bad':''}"><div class="n">${s.name}</div><div class="v">${val[s.k]}</div><div class="tiny dim">${sub[s.k]}</div>
+   <div style="margin-top:4px">${spark(last(s.k==='hrv'?'hrv':s.k),sigCol[s.k],bands[s.k],100,26)}</div></div>`).join('')}</div>
+   <div class="tiny dim" style="margin-top:6px">Rule: swap a KEY only when all three are off (HRV ${esc(sg[0].rule)}; resting HR ${esc(sg[1].rule)}; sleep ${esc(sg[2].rule)}).</div></div>
+  <div class="grid g3"><div class="kpi" style="text-align:center">${gauge(R.ready,100,R.ready>=70?'#22c55e':R.ready>=40?'#f59e0b':'#ef4444','READINESS',esc((R.readyl||'').toLowerCase()))}</div>
+   <div class="kpi"><div class="l">Garmin status</div><div class="v" style="font-size:15px">${esc((R.status||'--').replace(/_/g,' ').toLowerCase())}</div><div class="s">load ratio ${R.acwr??'--'} | acute ${R.acute??'--'} / chronic ${R.chronic??'--'}</div></div>
+   <div class="kpi"><div class="l">Form (TSB)</div><div class="v">${P.load.tsb.slice(-1)[0]??'--'}</div><div class="s">fitness ${P.load.ctl.slice(-1)[0]} | fatigue ${P.load.atl.slice(-1)[0]} (app's HR load)</div></div></div>
+  <div class="card"><h2>Today ${P.week?`<span class="pill">Week ${P.week.wk} | ${esc(P.week.phase)} | ${esc(P.week.type)}</span>`:''}</h2>
+   ${ts.length?ts.map(s=>sessCard(s,ts.length===1)).join(''):`<div class="mut">${rest?esc(rest.title)+'. ':''}Rest day in the plan.</div>`}
+   ${v.code==='SWAP'&&ts.some(s=>s.pri==='KEY')?'<div class="err small">Recovery says swap: do the KEY as Z1, or rest.</div>':''}</div>
+  <div class="card"><h2>Coach notes</h2>${notes.map(a=>`<div class="adv"><div class="dot" style="background:${a.k==='return'?'#f59e0b':a.k==='fuel'?'#fcd34d':a.k==='sleep'?'#a78bfa':'var(--swim)'}"></div><div><div><b>${esc(a.title)}</b></div><div class="small">${esc(a.txt)}</div><div class="src">${esc(a.src)}</div></div></div>`).join('')}</div>
+  <div class="card"><h2>Feel off? <span class="tiny dim">your plan rules</span></h2><div class="row wrap">${P.plan.rules.filter(r=>/Ill|Pain|Work week|Missed|Short on time/.test(r[0])).map((r,i)=>`<button class="ghost" data-rule="${i}">${esc(r[0].replace(/ \(.*/,''))}</button>`).join('')}</div><div id="ruleTxt" class="small" style="margin-top:8px"></div></div>
+  <div class="card"><h2>Next days</h2>${Object.keys(byd).slice(0,7).map(d=>`<div class="row between" style="padding:6px 0;border-top:1px solid var(--line)"><div style="width:76px" class="small"><b>${fdw(d).slice(0,3)}</b> <span class="mut">${fd(d)}</span></div><div style="flex:1">${byd[d].map(s=>`<div class="small"><span class="zb" style="background:${spc(PSP[s.sport])}"></span>${esc(s.title)} <span class="dim">${s.min?hm(s.min*60):''}</span> ${s.pri==='KEY'||s.pri==='TEST'||s.pri==='RACE'?`<span class="badge ${s.pri}">${s.pri}</span>`:''}</div>`).join('')}</div></div>`).join('')}</div>
+  <div class="card"><h2>Countdown</h2><div class="grid g4">${A.map(r=>`<div class="kpi"><div class="l" style="color:${rc['ABC'.indexOf(r.pri)]}">${r.pri} race</div><div class="v">${r.days}<span class="tiny mut"> d</span></div><div class="s">${esc(r.name)}</div><div class="tiny dim">${r.date?fd(r.date):'date ?'}</div></div>`).join('')}</div></div>
+  <div class="card"><h2>Honest flags <span class="tiny dim">${P.flags.length}</span></h2>${flagList(P.flags)}</div>`}
+function flagList(F){const c={red:'#ef4444',amber:'#f59e0b',green:'#22c55e',grey:'#64748b'};
+  return F.map(f=>`<div class="flag"><div class="b" style="background:${c[f.lvl]}"></div><div><b class="small">${esc(f.title)}</b><div class="small mut">${esc(f.txt)}</div></div></div>`).join('')}
+AFTER.today=()=>{const rules=P.plan.rules.filter(r=>/Ill|Pain|Work week|Missed|Short on time/.test(r[0]));
+  document.querySelectorAll('[data-rule]').forEach(b=>b.onclick=()=>{const r=rules[+b.dataset.rule];$('#ruleTxt').innerHTML=`<b>${esc(r[0])}</b>: ${esc(r[1])}`})};
+
+/* ---------- ZONES ---------- */
+const THL=[['run_lthr','Run LTHR','bpm',v=>v],['run_pace','Run threshold pace','/km',v=>mmss(v)],['bike_ftp','Bike FTP (trainer)','W',v=>v],
+ ['bike_lthr','Bike LTHR','bpm',v=>v],['swim_css','Swim CSS','/100 m',v=>mmss(v)],['max_hr','Max HR','bpm',v=>v],['rhr','Resting HR','bpm',v=>v],
+ ['vo2_run','VO2max run','',v=>v],['vo2_bike','VO2max bike','',v=>v]];
+function zTable(rows,fmt,title,color,unit){if(!rows)return'';return `<div class="card"><h2>${title}</h2><table><tr><th>Zone</th><th>From</th><th>To</th><th style="width:40%"></th></tr>
+ ${rows.map((r,i)=>`<tr><td><span class="zb" style="background:${ZC[Math.min(i,6)]}"></span>${esc(r[0])}</td><td>${fmt(r[1])}</td><td>${fmt(r[2])}</td><td><div style="height:6px;border-radius:3px;background:${ZC[Math.min(i,6)]};opacity:.7;width:${30+i*10}%"></div></td></tr>`).join('')}</table>${unit?`<div class="tiny dim" style="margin-top:4px">${unit}</div>`:''}</div>`}
+function vZones(){
+  const zt=zoneTables(),M=P.model.race;
+  const ov=JSON.parse(localStorage.getItem('coachOv')||'{}');
+  const card=([k,l,u,f])=>{const t=TH[k];if(!t||t.v==null)return'';return `<div class="kpi"><div class="row between"><div class="l">${l}</div><span class="conf ${t.conf}">${t.local?'YOUR TEST':t.conf}</span></div>
+   <div class="v">${f(t.v)} <span class="tiny mut">${u}</span></div><div class="tiny mut">${esc(t.src||'')}${t.d?' | '+fd(t.d):''}</div>${t.alt?`<div class="tiny dim">Also: ${esc(t.alt)}</div>`:''}</div>`};
+  const rp=tv('run_pace'),ftp=tv('bike_ftp'),bl=tv('bike_lthr'),css=tv('swim_css');
+  const race=(name,bk)=>`<tr><td><b>${name}</b></td><td>${css?mmss(css+M.swim_703[0])+'-'+mmss(css+M.swim_703[1]):'--'}</td><td>${ftp?r0(ftp*M[bk][0])+'-'+r0(ftp*M[bk][1])+' W':'--'}<br><span class="dim">${bl?'HR '+r0(bl*M.bike_hr_703[0])+'-'+r0(bl*M.bike_hr_703[1]):''}</span></td><td>${rp?mmss(rp*M.run_703[0])+'-'+mmss(rp*M.run_703[1]):'--'}</td></tr>`;
+  return `<div class="card"><h2>Thresholds <span class="tiny dim">everything hangs on these</span></h2><div class="grid g2">${THL.map(card).join('')}</div></div>
+  <div class="card"><h2>Race-day targets</h2><table><tr><th></th><th>Swim /100 m</th><th>Bike</th><th>Run /km</th></tr>${race('70.3 Valencia','bike_703_valencia')}${race('La Santa half','bike_703_lanzarote')}</table>
+  <div class="tiny dim" style="margin-top:6px">Swim CSS+${M.swim_703[0]}-${M.swim_703[1]} s; bike ${M.bike_703_valencia.map(x=>Math.round(x*100)).join('-')}% FTP (La Santa ${M.bike_703_lanzarote.map(x=>Math.round(x*100)).join('-')}%), HR ${M.bike_hr_703.map(x=>Math.round(x*100)).join('-')}% bike LTHR without a power meter; run ${M.run_703.join('-')} x threshold pace. Season plan v3.2.</div></div>
+  ${zTable(zt.run_hr,r0,'Run heart rate','', '% of run LTHR, Friel')}${zTable(zt.run_pace,mmss,'Run pace /km','','x threshold pace, Friel')}
+  ${zTable(zt.bike_hr,r0,'Bike heart rate (outdoors)','','% of bike LTHR')}${zTable(zt.bike_w,r0,'Bike power (trainer)','','% of FTP, Coggan; SST 88-93%')}
+  ${zTable(zt.swim,mmss,'Swim pace /100 m','','CSS offsets in seconds')}
+  <div class="card"><h2>Enter a test <span class="tiny dim">saved on this phone</span></h2>
+   <div class="small mut">Same formulas as the tests in your plan. Zones and every session target update at once.</div>
+   <div style="margin-top:10px"><b class="small">Swim CSS test</b><div class="grid g2" style="margin-top:4px"><input id="t400" placeholder="400 m time  m:ss"><input id="t200" placeholder="200 m time  m:ss"></div></div>
+   <div style="margin-top:10px"><b class="small">Bike 20' test (trainer)</b><div class="grid g2" style="margin-top:4px"><input id="fw" inputmode="numeric" placeholder="avg power W"><input id="fh" inputmode="numeric" placeholder="avg HR"></div></div>
+   <div style="margin-top:10px"><b class="small">Run 30' time trial, last 20'</b><div class="grid g2" style="margin-top:4px"><input id="rp" placeholder="avg pace  m:ss /km"><input id="rh" inputmode="numeric" placeholder="avg HR"></div></div>
+   <div style="margin-top:10px"><b class="small">Or set one directly</b><div class="grid g2" style="margin-top:4px"><select id="ok">${THL.slice(0,6).map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select><input id="ov" placeholder="value (pace as m:ss)"></div></div>
+   <div class="row" style="margin-top:12px;gap:8px"><button class="btn" id="tsave">Save</button><button class="ghost" id="treset">Reset to Garmin + plan</button></div>
+   <div id="tmsg" class="small" style="margin-top:8px">${Object.keys(ov).length?'Your entries: '+Object.entries(ov).map(([k,o])=>`${k} ${o.v} (${o.d})`).join(', '):''}</div>
+   <div class="tiny dim" style="margin-top:6px">To make a test permanent for every device and the morning push, add it to coach/overrides.json.</div></div>`}
+AFTER.zones=()=>{
+  const sec=s=>{if(!s)return null;const m=String(s).trim().match(/^(\d+):(\d{1,2})$/);return m?(+m[1])*60+(+m[2]):(isNaN(+s)?null:+s)};
+  $('#tsave').onclick=()=>{const ov=JSON.parse(localStorage.getItem('coachOv')||'{}'),d=iso(new Date()),msg=[];
+    const a=sec($('#t400').value),b=sec($('#t200').value);if(a&&b&&a>b){ov.swim_css={v:Math.round((a-b)/2),d,src:'Your CSS test (T400-T200)/2'};msg.push('CSS '+mmss((a-b)/2))}
+    const w=+$('#fw').value,h=+$('#fh').value;if(w>50){ov.bike_ftp={v:Math.round(w*.95),d,src:"Your 20' test x 0.95"};msg.push('FTP '+Math.round(w*.95))}
+    if(h>80){ov.bike_lthr={v:Math.round(h*.95),d,src:"0.95 x avg HR of your 20' test"};msg.push('bike LTHR '+Math.round(h*.95))}
+    const p=sec($('#rp').value),rh=+$('#rh').value;if(p&&p>150){ov.run_pace={v:p,d,src:"Your 30' TT, last 20'"};msg.push('threshold '+mmss(p))}
+    if(rh>100){ov.run_lthr={v:rh,d,src:"Your 30' TT, avg HR last 20'"};msg.push('run LTHR '+rh)}
+    const k=$('#ok').value,x=$('#ov').value.trim();if(x){const v=(k==='run_pace'||k==='swim_css')?sec(x):+x;if(v){ov[k]={v,d,src:'Entered by you'};msg.push(k+' '+x)}}
+    localStorage.setItem('coachOv',JSON.stringify(ov));loadTH();render();$('#tmsg').textContent=msg.length?'Saved: '+msg.join(', '):'Nothing to save: fill a test.'};
+  $('#treset').onclick=()=>{localStorage.removeItem('coachOv');loadTH();render()}};
+
+/* ---------- LOAD ---------- */
+let LR=+(localStorage.getItem('coachLR')||180),SB='d28';
+function vLoad(){
+  const L=P.load,n=Math.min(LR,L.d.length),sl=a=>a.slice(-n);
+  const wk=P.weekly.slice(-26),sum=w=>w.swim+w.bike+w.run+w.strength+w.other;
+  const pl=wk.map(w=>w.plan?r0((w.plan.swim+w.plan.bike+w.plan.run+w.plan.strength+w.plan.other)*10)/10:null);
+  const intn=k=>{const ws=P.weekly.slice(-k-1,-1),t=[0,0,0];ws.forEach(w=>w.int.forEach((x,i)=>t[i]+=x));const s=t[0]+t[1]+t[2];return{t,s}};
+  const ibar=k=>{const{t,s}=intn(k);if(!s)return`<div class="mut small">No HR data</div>`;const c=['#38bdf8','#f59e0b','#ef4444'];
+    return `<div class="row" style="gap:6px"><div style="width:58px" class="small mut">${k} wk</div><div style="flex:1;display:flex;height:16px;border-radius:5px;overflow:hidden">${t.map((x,i)=>`<div style="width:${x/s*100}%;background:${c[i]}" title="${x.toFixed(1)} h"></div>`).join('')}</div>
+    <div class="tiny" style="width:120px;text-align:right">${t.map(x=>Math.round(x/s*100)+'%').join(' / ')}</div></div>`};
+  const dd=P.days,m=Math.min(LR,dd.d.length);
+  const sp=['swim','bike','run','strength'],S=P.sports;
+  const pace=(k,b)=>k==='run'?(b.pace?mmss(b.pace)+'/km':'--'):k==='swim'?(b.pace?mmss(b.pace)+'/100':'--'):k==='bike'?(b.kmh?b.kmh+' km/h out':'--'):'';
+  return `<div class="row between" style="margin-top:6px">${seg('lr',[[90,'90 d'],[180,'6 mo'],[365,'1 yr']],LR)}<span class="tiny dim">HR-based load, all sports</span></div>
+  <div class="card"><h2>Fitness, fatigue, form</h2>${chart({x:sl(L.d),h:170,lines:[{v:sl(L.ctl),c:'#38bdf8',w:2.2,area:1,lastLabel:1},{v:sl(L.atl),c:'#f472b6',w:1.3}]})}
+   ${chart({x:sl(L.d),h:80,bars:[{v:sl(L.tsb),c:v=>v>=0?'#22c55e':'#ef4444',o:.7}],refs:[{y:0,c:'#475569'}]})}
+   <div class="legend"><span><i style="background:#38bdf8"></i>fitness (42-day load) ${L.ctl.slice(-1)[0]}</span><span><i style="background:#f472b6"></i>fatigue (7-day) ${L.atl.slice(-1)[0]}</span><span><i style="background:#22c55e"></i>form = fitness - fatigue ${L.tsb.slice(-1)[0]}</span></div>
+   <div class="tiny dim" style="margin-top:4px">Load per session = hours x (HR intensity vs LTHR)&sup2; x 100, on heart-rate reserve. Same idea as TrainingPeaks hrTSS; not Garmin's load number.</div></div>
+  <div class="card"><h2>Weekly hours vs plan <span class="tiny dim">26 weeks</span></h2>${stack({x:wk.map(w=>w.w),every:4,stacks:[{v:wk.map(w=>w.swim),c:'var(--swim)',label:'swim'},{v:wk.map(w=>w.bike),c:'var(--bike)',label:'bike'},{v:wk.map(w=>w.run),c:'var(--run)',label:'run'},{v:wk.map(w=>w.strength),c:'var(--str)',label:'strength'},{v:wk.map(w=>w.other),c:'var(--oth)',label:'other'}],line:{v:pl,c:'#f8fafc'}})}
+   <div class="legend"><span><i style="background:var(--swim)"></i>swim</span><span><i style="background:var(--bike)"></i>bike</span><span><i style="background:var(--run)"></i>run</span><span><i style="background:var(--str)"></i>strength</span><span><i style="background:var(--oth)"></i>other (walks, soccer)</span><span><i style="background:#f8fafc"></i>plan</span></div>
+   <table style="margin-top:8px"><tr><th>Week</th><th>Done h</th><th>Plan h</th><th>Swim km</th><th>Bike km</th><th>Run km</th></tr>${P.weekly.slice(-6).reverse().map(w=>`<tr><td>${fd(w.w)}</td><td>${sum(w).toFixed(1)}</td><td>${w.plan?(w.plan.swim+w.plan.bike+w.plan.run+w.plan.strength+w.plan.other).toFixed(1):'-'}</td><td>${w.km.swim}</td><td>${w.km.bike}</td><td>${w.km.run}</td></tr>`).join('')}</table></div>
+  <div class="card"><h2>Intensity split <span class="tiny dim">swim+bike+run by avg HR</span></h2>${ibar(4)}<div style="height:6px"></div>${ibar(12)}<div style="height:6px"></div>${ibar(26)}
+   <div class="legend"><span><i style="background:#38bdf8"></i>easy (&lt;Z3)</span><span><i style="background:#f59e0b"></i>moderate (Z3)</span><span><i style="background:#ef4444"></i>hard (Z4+)</span></div><div class="tiny dim">Whole-session average HR, so intervals inside an easy session count as easy.</div></div>
+  <div class="card"><h2>Every training day, 12 months</h2>${heat(P.acts,P.horizon)}</div>
+  <div class="card"><h2>By sport ${seg('sb',[['d28','28 d'],['d90','90 d'],['d365','1 yr']],SB)}</h2><table><tr><th></th><th>Sessions</th><th>Hours</th><th>km</th><th>Pace</th><th>Avg HR</th></tr>
+   ${sp.map(k=>{const b=S[k][SB];return `<tr><td><span class="zb" style="background:${spc(k)}"></span>${k}</td><td>${b.n}</td><td>${b.h??0}</td><td>${k==='strength'?'':b.km}</td><td>${pace(k,b)}</td><td>${b.hr??'--'}</td></tr>`}).join('')}</table>
+   <div class="tiny dim" style="margin-top:4px">Bike: ${S.bike[SB].indoor||0} indoor, ${S.bike[SB].power||0} with power.</div></div>
+  <div class="card"><h2>Garmin acute vs chronic load</h2>${chart({x:dd.d.slice(-m),h:140,lines:[{v:dd.chronic.slice(-m),c:'#38bdf8',w:2},{v:dd.acute.slice(-m),c:'#f59e0b'}]})}
+   ${chart({x:dd.d.slice(-m),h:70,ymin:0,lines:[{v:dd.acwr.slice(-m),c:'#e2e8f0'}],refs:[{y:1.5,c:'#ef4444',t:'1.5'},{y:.8,c:'#22c55e',t:'0.8'}]})}
+   <div class="legend"><span><i style="background:#38bdf8"></i>chronic</span><span><i style="background:#f59e0b"></i>acute</span><span><i style="background:#e2e8f0"></i>load ratio</span></div><div class="tiny dim">From the Garmin export; stops at ${fd(P.src.garmin_export.last_day)}.</div></div>`}
+AFTER.load=()=>{bindSeg('lr',k=>{LR=+k;localStorage.setItem('coachLR',k);render()});bindSeg('sb',k=>{SB=k;render()})};
+
+/* ---------- RECOVERY ---------- */
+let RR=+(localStorage.getItem('coachRR')||90);
+function vRec(){
+  const dd=P.days,m=Math.min(RR,dd.d.length),S=k=>dd[k].slice(-m),x=S('d');
+  const rh=S('rhr'),med=[];rh.forEach((_,i)=>{const w=rh.slice(Math.max(0,i-29),i+1).filter(v=>v!=null).sort((a,b)=>a-b);med.push(w.length?w[Math.floor(w.length/2)]:null)});
+  const sm=Math.min(m,60),SS=k=>dd[k].slice(-sm),sx=SS('d');
+  const stg=['deep','rem','light','awake'],stc=['#6366f1','#a78bfa','#38bdf8','#f87171'];
+  const avg=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((s,y)=>s+y,0)/v.length:null};
+  const bedMin=SS('bed').map(b=>{if(!b)return null;const[h,mm]=b.split(':').map(Number);let t=h*60+mm;if(t<12*60)t+=24*60;return t});
+  const sk=dd.hrvst.slice(-m).filter(Boolean),cnt={};sk.forEach(s=>cnt[s]=(cnt[s]||0)+1);
+  const kg=dd.kg.map((v,i)=>[dd.d[i],v]).filter(r=>r[1]);
+  return `<div class="row between" style="margin-top:6px">${seg('rr',[[30,'30 d'],[90,'90 d'],[180,'6 mo'],[365,'1 yr']],RR)}<span class="tiny dim">nights to ${fd(dd.d[dd.d.length-1])}</span></div>
+  <div class="card"><h2>HRV overnight <span class="tiny dim">ms</span></h2>${chart({x,h:170,band:{lo:S('hrvlo'),hi:S('hrvhi'),c:'#22c55e'},lines:[{v:S('hrv'),c:'#38bdf8',w:1,dots:m<=90?1.6:0},{v:S('hrv7'),c:'#f8fafc',w:2.2}]})}
+   <div class="legend"><span><i style="background:#38bdf8"></i>night</span><span><i style="background:#f8fafc"></i>7-day average</span><span><i style="background:#22c55e;opacity:.4;height:8px"></i>your Garmin baseline band</span></div>
+   <div class="tiny dim" style="margin-top:4px">Status in this period: ${Object.entries(cnt).map(([k,v])=>`${k.replace('_',' ').toLowerCase()} ${v}`).join(', ')||'none'}. Below or above the band 2+ days = the plan's "Low/Unbalanced".</div></div>
+  <div class="card"><h2>Resting heart rate <span class="tiny dim">bpm</span></h2>${chart({x,h:140,lines:[{v:rh,c:'#f87171',w:1.4,dots:m<=90?1.5:0},{v:med,c:'#94a3b8',dash:'4 3'}]})}
+   <div class="legend"><span><i style="background:#f87171"></i>morning</span><span><i style="background:#94a3b8"></i>30-day median (your normal); +5 bpm is the plan's warning</span></div></div>
+  <div class="card"><h2>Sleep <span class="tiny dim">last ${sm} nights</span></h2>${stack({x:sx,h:160,every:Math.ceil(sm/6),stacks:stg.map((k,i)=>({v:SS(k),c:stc[i],label:k})),line:{v:sx.map(()=>8),c:'#334155'}})}
+   <div class="legend">${stg.map((k,i)=>`<span><i style="background:${stc[i]}"></i>${k} ${(avg(SS(k))||0).toFixed(1)} h</span>`).join('')}<span><i style="background:#334155"></i>8 h target</span></div>
+   ${chart({x:sx,h:90,ymin:30,ymax:100,lines:[{v:SS('sscore'),c:'#a78bfa',dots:1.5}],refs:[{y:60,c:'#ef4444',t:'60'}]})}
+   ${chart({x:sx,h:80,invert:true,tstep:60,yfmt:v=>{v=Math.round(v)%1440;return String(Math.floor(v/60)).padStart(2,'0')+':'+String(v%60).padStart(2,'0')},lines:[{v:bedMin,c:'#fbbf24',dots:1.6}]})}
+   <div class="legend"><span><i style="background:#a78bfa"></i>sleep score (avg ${r0(avg(SS('sscore')))})</span><span><i style="background:#fbbf24"></i>bedtime</span></div></div>
+  <div class="card"><h2>Training readiness and Body Battery</h2>${chart({x,h:140,ymin:0,ymax:100,lines:[{v:S('ready'),c:'#22c55e',w:1.8},{v:S('bbh'),c:'#38bdf8',w:1.1,dash:'3 2'},{v:S('stress'),c:'#f59e0b',w:1}]})}
+   <div class="legend"><span><i style="background:#22c55e"></i>readiness</span><span><i style="background:#38bdf8"></i>Body Battery peak</span><span><i style="background:#f59e0b"></i>stress (avg)</span></div></div>
+  <div class="card"><h2>Weight <span class="tiny dim">${kg.length} entries</span></h2>${kg.length>1?chart({x:kg.map(r=>r[0]),xfmt:d=>MON[+d.slice(5,7)-1]+' '+d.slice(2,4),h:110,lines:[{v:kg.map(r=>r[1]),c:'#e2e8f0',dots:2}]}):'<div class="mut small">Not enough entries.</div>'}
+   <div class="tiny dim">Last ${kg.length?kg[kg.length-1][1]+' kg on '+fd(kg[kg.length-1][0])+' '+kg[kg.length-1][0].slice(0,4):'--'}. Entries are irregular, so the x axis is entries, not time.</div></div>`}
+AFTER.recovery=()=>bindSeg('rr',k=>{RR=+k;localStorage.setItem('coachRR',k);render()});
+
+/* ---------- RACES ---------- */
+function timeline(){
+  const t0=D(P.today),races=P.races.filter(r=>(r.date||r.plan_date)),end=D('2027-07-12'),W=360,H=78,L=6,R=6;
+  const X=d=>L+(D(d)-t0)/(end-t0)*(W-L-R);const pc=p=>/peak|sim/i.test(p)?'#9f1239':/race week|Taper|Half #1/i.test(p)?'#15803d':/Backyard/.test(p)?'#6d28d9':/Build|Olympic/.test(p)?'#b45309':/Base/.test(p)?'#1d4ed8':/Speed|Rebuild/.test(p)?'#0f766e':'#334155';
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%">`;
+  P.plan.weeks.forEach(w=>{const a=w.start,b=addD(w.start,7);if(D(b)<t0)return;const x1=Math.max(L,X(a)),x2=Math.min(W-R,X(b));
+    s+=`<rect x="${x1}" y="44" width="${Math.max(0,x2-x1-.5)}" height="10" fill="${pc(w.phase)}"><title>W${w.wk} ${w.phase} ${w.type}</title></rect>`});
+  let lastPh='',lx=-99;P.plan.weeks.forEach(w=>{const k=pc(w.phase),x0=Math.max(L,X(w.start));if(D(addD(w.start,7))<t0||k===lastPh)return;lastPh=k;if(x0-lx<34)return;lx=x0;s+=`<text x="${x0+1}" y="66" fill="#5b6b80" font-size="7">${esc(w.phase.split(/[ (+]/)[0])}</text>`});
+  races.forEach((r,i)=>{const d=r.date||r.plan_date,x=X(d),c=r.pri==='A'?'#f87171':r.pri==='B'?'#fbbf24':'#60a5fa';
+    s+=`<line x1="${x}" x2="${x}" y1="${r.pri==='A'?6:18}" y2="54" stroke="${c}" stroke-width="${r.pri==='A'?2:1}" ${r.date?'':'stroke-dasharray="2 2"'}/><circle cx="${x}" cy="${r.pri==='A'?6:18}" r="${r.pri==='A'?4:2.5}" fill="${c}"/>`;
+    if(r.pri==='A')s+=`<text x="${x-4}" y="${9}" fill="${c}" font-size="8" text-anchor="end">${r.name.includes('Valencia')?'Valencia':'La Santa'}</text>`});
+  for(let m=0;m<9;m++){const d=new Date(t0.getFullYear(),t0.getMonth()+m+1,1);if(d>end)break;s+=`<text x="${X(iso(new Date(d.getTime()+43200000)))}" y="76" fill="#5b6b80" font-size="7" text-anchor="middle">${MON[d.getMonth()]}</text>`}
+  return s+`<line x1="${L}" x2="${L}" y1="0" y2="56" stroke="#38bdf8"/></svg><div class="legend"><span><i style="background:#f87171"></i>A race</span><span><i style="background:#fbbf24"></i>B</span><span><i style="background:#60a5fa"></i>C</span><span>dashed = date not confirmed</span></div>`}
+function predCard(p){if(!p||!p.legs.length)return'';const tot=p.total,mx=Math.max(...p.legs.map(l=>l.hi));const c=['var(--swim)','var(--bike)','var(--run)','var(--oth)'];
+  return `<div style="margin-top:8px">${p.legs.map((l,i)=>`<div style="margin:6px 0"><div class="row between small"><b>${esc(l.leg)}</b><span>${hms(l.lo)} - ${hms(l.hi)}</span></div>
+   <div style="position:relative;height:8px;background:#0d141c;border-radius:4px;margin:3px 0"><div style="position:absolute;left:${l.lo/mx*100}%;width:${Math.max(1,(l.hi-l.lo)/mx*100)}%;height:8px;border-radius:4px;background:${c[i]}"></div><div style="width:${l.lo/mx*100}%;height:8px;border-radius:4px;background:${c[i]};opacity:.35"></div></div>
+   <div class="tiny dim">${esc(l.how)}</div></div>`).join('')}
+   ${tot?`<div class="row between" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><b>Finish, today's fitness</b><b style="font-size:18px">${hms(tot[0])} - ${hms(tot[1])}</b></div>`:''}
+   <div class="tiny dim">Confidence ${p.conf}. ${esc(p.note)}</div></div>`}
+function vRaces(){
+  const dd=P.days,x=dd.d,pr=[['p5','5 km'],['p10','10 km'],['ph','Half'],['pm','Marathon']];
+  const first=k=>{const i=dd[k].findIndex(v=>v!=null);return i<0?null:dd[k][i]},lastv=k=>{for(let i=dd[k].length-1;i>=0;i--)if(dd[k][i]!=null)return dd[k][i];return null};
+  const best=k=>Math.min(...dd[k].filter(v=>v!=null));
+  const H=P.th_hist,lt=H.lthr_run||[],lp=H.lt_pace||[];
+  const res=P.results.slice().reverse();
+  return `<div class="card"><h2>Season to Lanzarote</h2>${timeline()}</div>
+  ${P.races.map(r=>`<div class="card"><div class="row between"><div><span class="badge ${r.pri==='A'?'KEY':r.pri==='B'?'RACE':'CORE'}">${r.pri}</span> <b>${esc(r.name)}</b></div><div style="text-align:right"><b style="font-size:20px">${r.days??'?'}</b><span class="tiny mut"> days</span></div></div>
+   <div class="small mut" style="margin-top:4px">${r.date?fdw(r.date)+' '+r.date.slice(0,4):'Date not set'}${r.plan_date&&r.plan_date!==r.date?` | plan has ${fd(r.plan_date)}`:''}</div>
+   <div class="tiny ${/NOT|ASSUMED/.test(r.status)?'':'dim'}" style="margin-top:3px;${/NOT|ASSUMED/.test(r.status)?'color:#fbbf24':''}">${esc(r.status)}</div>
+   ${r.pred?predCard(r.pred):''}${r.garmin&&r.garmin.half?`<div class="small" style="margin-top:6px">Garmin half prediction today: <b>${hms(r.garmin.half)}</b> <span class="dim">(best in file ${hms(best('ph'))})</span></div>`:''}</div>`).join('')}
+  <div class="card"><h2>Garmin race predictor <span class="tiny dim">2 years, lower is faster</span></h2><div class="grid g2">${pr.map(([k,l])=>`<div><div class="row between small"><b>${l}</b><span>${hms(lastv(k))}</span></div>${chart({x,w:180,h:96,L:36,invert:true,yfmt:v=>hms(v).replace(/^0:/,''),lines:[{v:dd[k],c:'#38bdf8',w:1.4,lastLabel:1}]})}<div class="tiny dim">best ${hms(best(k))} | first ${hms(first(k))}</div></div>`).join('')}</div>
+   <div class="tiny dim" style="margin-top:4px">Garmin derives these from running VO2max and recent runs; they drop when running stops.</div></div>
+  <div class="card"><h2>VO2max (running)</h2>${chart({x,h:110,lines:[{v:dd.vo2,c:'#22c55e',w:1.8,join:1}]})}</div>
+  <div class="card"><h2>Threshold history <span class="tiny dim">Garmin auto-detect</span></h2>
+   <div class="small"><b>Run LTHR</b> <span class="mut">bpm</span></div>${chart({x:lt.map(r=>r[0]),h:100,lines:[{v:lt.map(r=>r[1]),c:'#f87171',dots:2}]})}
+   <div class="small"><b>Threshold pace</b> <span class="mut">per km, lower is faster</span></div>${chart({x:lp.map(r=>r[0]),h:100,invert:true,yfmt:mmss,lines:[{v:lp.map(r=>r[1]),c:'#22c55e',dots:2}]})}
+   <div class="tiny dim">Points are detection events, not evenly spaced in time.</div></div>
+  <div class="card"><h2>Aerobic efficiency <span class="tiny dim">metres per heartbeat, steady runs</span></h2>${chart({x:P.eff.map(e=>e[0]+'-15'),h:110,bars:[{v:P.eff.map(e=>e[1]),c:'#22c55e',o:.75}],ymin:Math.min(...P.eff.map(e=>e[1]))*.95})}
+   <div class="tiny dim">Monthly median of runs 40-120' with average HR 130-165. Higher = more speed for the same heart rate. Terrain and heat move it too.</div></div>
+  <div class="card"><h2>Multisport sessions in the file</h2><table><tr><th>Date</th><th>Where</th><th>Total</th><th>Swim</th><th>Bike</th><th>Run</th></tr>
+   ${res.map(r=>`<tr><td>${fd(r.d)} ${r.d.slice(2,4)}</td><td class="small">${esc((r.place||'').replace(/ Multi.*/,''))}<br><span class="dim">${r.km} km</span></td><td>${hms(r.total)}</td>
+   <td>${r.swim?mmss(r.swim[0]/(r.swim[1]/100))+'<br><span class="dim">/100 m</span>':'-'}</td><td>${r.bike?(r.bike[1]/r.bike[0]*3.6).toFixed(1)+'<br><span class="dim">km/h</span>':'-'}</td><td>${r.run?mmss(r.run[0]/(r.run[1]/1000))+'<br><span class="dim">/km</span>':'-'}</td></tr>`).join('')}</table>
+   <div class="tiny dim">From the watch's multisport rows (elapsed time). Not official results; some may be training bricks.</div></div>
+  <div class="card"><h2>Garmin records</h2><table>${P.records.map(r=>`<tr><td class="small">${esc(r.t)}</td><td style="text-align:right">${r.unit==='s'?hms(r.v).replace(/^0:/,''):r.unit==='m'?(r.v/1000).toFixed(1)+' km':Math.round(r.v)+' '+r.unit}${r.note?`<div class="tiny" style="color:#fbbf24">${esc(r.note)}</div>`:''}</td></tr>`).join('')}</table></div>`}
+
+/* ---------- PLAN ---------- */
+let PW=null;
+function vPlan(){
+  const W=P.plan.weeks,S=P.plan.sessions;if(PW==null)PW=P.week?P.week.wk:0;
+  const w=W.find(x=>x.wk===PW)||W[0],ws=S.filter(s=>s.wk===w.wk);
+  const days=[];const st=D(w.start),mon=new Date(st);mon.setDate(mon.getDate()-((st.getDay()+6)%7));
+  for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(d.getDate()+i);days.push(iso(d))}
+  const pmin=ws.reduce((a,s)=>a+(s.min||0),0);
+  const done=P.acts.filter(a=>a.d>=days[0]&&a.d<=days[6]&&['swim','bike','run','strength','multi'].includes(a.sport)&&!(a.multi&&P.acts.some(b=>b.parent===a.id))).reduce((a,x)=>a+(x.mov||0)/60,0);
+  const byW={};P.comp.forEach(c=>{const o=byW[c.wk]=byW[c.wk]||{done:0,short:0,swapped:0,missed:0,nodata:0,today:0};o[c.st]++});
+  const wks=Object.keys(byW).map(Number).sort((a,b)=>a-b);
+  const ph=W.map(x=>{const h=S.filter(s=>s.wk===x.wk).reduce((a,s)=>a+(s.min||0),0)/60;return h});
+  const pcol=p=>/peak|sim/i.test(p)?'#9f1239':/race week|Taper|Half #1/i.test(p)?'#15803d':/Backyard/.test(p)?'#6d28d9':/Build|Olympic/.test(p)?'#b45309':/Base/.test(p)?'#1d4ed8':/Speed|Rebuild/.test(p)?'#0f766e':'#334155';
+  const mx=Math.max(...ph),BW=360/W.length;
+  let mtn=`<svg viewBox="0 0 360 120" width="100%">`;W.forEach((x,i)=>{const h=ph[i]/mx*96;mtn+=`<rect x="${i*BW+.5}" y="${104-h}" width="${BW-1}" height="${h}" fill="${pcol(x.phase)}" opacity="${x.wk===PW?1:.6}" ${x.wk===PW?'stroke="#f8fafc"':''}><title>W${x.wk} ${x.phase}: ${ph[i].toFixed(1)} h</title></rect>`;
+    if(i%4===0)mtn+=`<text x="${i*BW+BW/2}" y="116" fill="#5b6b80" font-size="8" text-anchor="${anc(i*BW+BW/2,360)}">${fd(x.start)}</text>`});
+  const ti=W.findIndex(x=>P.week&&x.wk===P.week.wk);if(ti>=0)mtn+=`<line x1="${ti*BW+BW/2}" x2="${ti*BW+BW/2}" y1="0" y2="104" stroke="#38bdf8" stroke-dasharray="2 2"/><text x="${ti*BW+BW/2+3}" y="9" fill="#38bdf8" font-size="8">today</text>`;
+  mtn+=`<text x="2" y="9" fill="#5b6b80" font-size="8">${mx.toFixed(1)} h</text></svg>`;
+  const cc={done:'#22c55e',short:'#f59e0b',swapped:'#a78bfa',missed:'#ef4444',nodata:'#475569'};
+  return `<div class="card"><div class="row between"><button class="ghost" id="pwp">&lsaquo;</button><div style="text-align:center"><b>Week ${w.wk}</b> <span class="mut small">from ${fd(days[0])}</span><div class="small">${esc(w.phase)} | ${esc(w.type)}</div></div><button class="ghost" id="pwn">&rsaquo;</button></div>
+   <div class="small mut" style="margin-top:6px">${esc(w.focus)}</div>
+   <div class="row" style="margin-top:8px;gap:14px"><div class="small">Planned <b>${hm(pmin*60)}</b></div><div class="small">Done <b>${hm(done*60)}</b> <span class="dim">(on file)</span></div>${P.week&&w.wk!==P.week.wk?'<button class="ghost" id="pwt" style="margin-left:auto">This week</button>':''}</div>
+   <div class="week" style="margin-top:8px">${days.map(d=>`<div class="day ${d===P.today?'today':''}"><div class="dn">${fdw(d).slice(0,3)} ${D(d).getDate()}</div>${ws.filter(s=>s.d===d&&s.sport!=='Rest').map(s=>`<div class="chip st-${s.st||'up'}${s.pri==='KEY'||s.pri==='TEST'||s.pri==='RACE'?' ckey':''}" title="${esc(s.title)}" style="background:${spc(PSP[s.sport])}"><b>${s.sport==='Other'?'T':(SP[PSP[s.sport]]||SP.other)[1]}</b> ${s.min?(s.min>=60?hm(s.min*60):s.min+"'"):''}</div>`).join('')||'<div class="tiny dim" style="margin-top:4px">rest</div>'}
+    ${P.acts.filter(a=>a.d===d&&!a.parent&&d<=P.horizon).map(a=>`<div class="tiny" style="margin-top:3px;color:${spc(a.sport)}">&#10003; ${a.sport} ${Math.round((a.mov||0)/60)}'</div>`).join('')}</div>`).join('')}</div>
+   <div class="legend"><span>chips = plan (SW swim, BK bike, RN run, ST strength, T transition)</span><span style="border-bottom:3px solid #b91c1c">KEY</span><span>&#10003; = done on the watch</span><span style="text-decoration:line-through">missed</span><span>faded = other sport / short</span></div></div>
+  <div class="card"><h2>Sessions this week</h2>${ws.filter(s=>s.sport!=='Rest').map(s=>sessCard(s,false)).join('')}</div>
+  <div class="card"><h2>Plan so far</h2>${wks.map(k=>{const o=byW[k],t=Object.values(o).reduce((a,b)=>a+b,0);return `<div class="row" style="gap:6px;margin:4px 0"><div class="small" style="width:42px">W${k}</div><div style="flex:1;display:flex;height:14px;border-radius:4px;overflow:hidden">${Object.keys(cc).map(s=>o[s]?`<div title="${s} ${o[s]}" style="width:${o[s]/t*100}%;background:${cc[s]}"></div>`:'').join('')}</div><div class="tiny" style="width:64px;text-align:right">${o.done}/${t-o.nodata-o.today}</div></div>`}).join('')}
+   <div class="legend">${Object.entries(cc).map(([k,c])=>`<span><i style="background:${c};height:8px"></i>${k==='swapped'?'other sport':k==='nodata'?'no data yet':k}</span>`).join('')}</div></div>
+  <div class="card"><h2>The season, planned hours</h2>${mtn}</div>
+  <div class="card"><h2>Rules</h2>${P.plan.rules.map(r=>`<div class="adv"><div class="dot" style="background:#f59e0b"></div><div><b class="small">${esc(r[0])}</b><div class="small mut">${esc(r[1])}</div></div></div>`).join('')}</div>
+  <div class="card"><h2>Habits</h2>${P.plan.habits.map(r=>`<div class="adv"><div class="dot"></div><div><b class="small">${esc(r[0])}</b><div class="small mut">${esc(r[1])}</div></div></div>`).join('')}
+   <div class="small" style="margin-top:8px"><b>Evening routine rotation:</b> ${Object.entries(P.plan.ritual||{}).map(([d,r])=>`<span class="tag">${d} ${esc(r)}</span>`).join('')}</div></div>`}
+AFTER.plan=()=>{const W=P.plan.weeks;$('#pwp').onclick=()=>{PW=Math.max(W[0].wk,PW-1);render()};$('#pwn').onclick=()=>{PW=Math.min(W[W.length-1].wk,PW+1);render()};const t=$('#pwt');if(t)t.onclick=()=>{PW=P.week.wk;render()}};
+
+/* ---------- LOG ---------- */
+let LF='all';
+function vLog(){
+  const xs=P.acts.filter(a=>!a.parent||a.sport!=='multi').filter(a=>LF==='all'||a.sport===LF).slice().reverse().slice(0,120);
+  const spd=a=>{if(!a.dist||!a.mov)return'';if(a.sport==='run')return mmss(a.mov/(a.dist/1000))+'/km';if(a.sport==='swim')return mmss(a.mov/(a.dist/100))+'/100';if(a.sport==='bike')return(a.dist/a.mov*3.6).toFixed(1)+' km/h';return(a.dist/1000).toFixed(1)+' km'};
+  return `<div class="row between" style="margin-top:6px">${seg('lf',[['all','All'],['swim','Swim'],['bike','Bike'],['run','Run'],['strength','Str'],['other','Other']],LF)}</div>
+  <div class="card">${xs.map(a=>`<div class="act"><div class="ic" style="background:${spc(a.sport)}">${AIC(a)}</div><div style="flex:1;min-width:0">
+   <div class="row between"><b class="small" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(a.name||a.type)}</b><span class="tiny mut">${fd(a.d)} ${a.t||''}</span></div>
+   <div class="tiny mut">${hm(a.mov)}${a.dist?' | '+(a.dist/1000).toFixed(a.sport==='swim'?2:1)+' km':''}${spd(a)?' | '+spd(a):''}${a.hr?' | HR '+Math.round(a.hr)+(a.hrmax?'/'+Math.round(a.hrmax):''):''}${a.w?' | '+Math.round(a.w)+' W':''}${a.elev>20?' | +'+Math.round(a.elev)+' m':''}</div>
+   <div class="row" style="gap:8px;margin-top:3px">${zoneBar(a.z)}<span class="tiny dim">load ${a.tss??'-'}${a.te?' | TE '+a.te:''}${a.rpe?' | RPE '+a.rpe:''}${a.parent?' | race leg':''}</span></div></div></div>`).join('')||'<div class="mut">Nothing here.</div>'}</div>
+  <div class="tiny dim">Zone bar: time in Garmin HR zones 0-5. Load: this app's HR load.</div>
+  <div class="tiny dim" style="margin-top:6px">Data: Garmin export to ${fd(P.src.garmin_export.last_day)}; after that ${esc((P.src.live||{}).source||'nothing')}${(P.src.live||{}).source?' (+'+((P.src.live||{}).acts||0)+' activities, +'+((P.src.live||{}).nights||0)+' days)':''}.</div>
+  ${(P.errors||[]).map(e=>`<div class="tiny" style="color:#f59e0b">Sync problem: ${esc(e)}</div>`).join('')}`}
+AFTER.log=()=>bindSeg('lf',k=>{LF=k;render()});
+
+/* ---------- Settings: GitHub link, Garmin key, builds (all from the phone) ---------- */
+const GH='https://api.github.com';
+const ghRepo=()=>localStorage.getItem('ghRepo')||'d10crack/coach-src';
+const ghTok=()=>localStorage.getItem('ghToken')||'';
+const GKEY='coach/data/garmin.enc.json';
+let BOXMETA={salt:'coach/teletext/v1',rounds:600000};
+async function gh(path,opt){
+  const t=ghTok(); if(!t)throw new Error('No GitHub token saved yet');
+  const r=await fetch(GH+path,{...(opt||{}),headers:{Authorization:'Bearer '+t,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28',...((opt||{}).headers||{})}});
+  if(r.status===404)return null;
+  if(!r.ok){let m='';try{m=(await r.json()).message||''}catch(e){}
+    throw new Error(r.status===401?'GitHub refused the token (401). Make a new one.':r.status===403?'The token lacks permission for this repo (403).':`GitHub ${r.status} ${m}`)}
+  return r.status===204?true:r.json();
+}
+async function sealBox(obj){
+  const kb=localStorage.getItem('coachKey'); if(!kb)throw new Error('App is locked');
+  const key=await crypto.subtle.importKey('raw',b64(kb),'AES-GCM',false,['encrypt']);
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,new TextEncoder().encode(JSON.stringify(obj)));
+  return {v:1,alg:'AES-GCM/PBKDF2-SHA256',rounds:BOXMETA.rounds,salt:BOXMETA.salt,gz:0,iv:ub64(iv),ct:ub64(ct)};
+}
+const utf8b64=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+async function garminStored(){
+  const f=await gh(`/repos/${ghRepo()}/contents/${GKEY}`);
+  if(!f)return null;
+  try{
+    const box=JSON.parse(new TextDecoder().decode(b64(f.content.replace(/\n/g,''))));
+    const o=await openBox(box,localStorage.getItem('coachKey'));
+    return {...o,sha:f.sha};
+  }catch(e){return {bad:e.message,sha:f.sha}}
+}
+async function garminSave(k,exp){
+  const cur=await gh(`/repos/${ghRepo()}/contents/${GKEY}`);
+  const box=await sealBox({key:k,expires:exp||null,saved:new Date().toISOString().slice(0,16)});
+  await gh(`/repos/${ghRepo()}/contents/${GKEY}`,{method:'PUT',body:JSON.stringify({
+    message:'Garmin key from the app (encrypted)',content:utf8b64(JSON.stringify(box)),...(cur?{sha:cur.sha}:{})})});
+}
+async function buildNow(){ await gh(`/repos/${ghRepo()}/actions/workflows/coach.yml/dispatches`,{method:'POST',body:JSON.stringify({ref:'main'})}) }
+async function lastRun(){ const d=await gh(`/repos/${ghRepo()}/actions/runs?per_page=1`); return d&&d.workflow_runs&&d.workflow_runs[0] }
+const RUNTX={queued:'queued',in_progress:'building now',completed:'finished'};
+async function watchRun(el,known){
+  for(let i=0;i<60;i++){
+    await new Promise(r=>setTimeout(r,6000));
+    let r; try{r=await lastRun()}catch(e){el.textContent='Could not read the build: '+e.message;return}
+    if(!r)continue;
+    if(r.id===known&&r.status==='completed'){el.textContent='Waiting for the build to start...';continue}
+    el.innerHTML=`Build ${esc(RUNTX[r.status]||r.status)}${r.conclusion?' ('+esc(r.conclusion)+')':''} <a href="${esc(r.html_url)}" target="_blank" style="color:var(--swim)">open on GitHub</a>`;
+    if(r.status==='completed'){
+      if(r.conclusion==='success'){el.textContent='Build finished. Loading the new data...';await new Promise(r2=>setTimeout(r2,12000));await refresh();el.textContent='Up to date.'}
+      else el.innerHTML=`Build ${esc(r.conclusion)}. <a href="${esc(r.html_url)}" target="_blank" style="color:var(--swim)">see the log</a>`;
+      return;
+    }
+  }
+  el.textContent='Still building after 6 minutes: check GitHub.';
+}
+function vSet(){
+  const live=(P.src&&P.src.live)||{},errs=P.errors||[];
+  const age=Math.round((Date.now()-new Date(P.built).getTime())/36e5);
+  return `<div class="card set"><h2>Data</h2>
+   <div class="grid g2">
+    <div class="kpi"><div class="l">Built</div><div class="v" style="font-size:16px">${P.built.slice(11,16)}</div><div class="s">${age>0?age+' h ago':'just now'}</div></div>
+    <div class="kpi"><div class="l">Newest data</div><div class="v" style="font-size:16px">${fd(P.horizon)}</div><div class="s">export to ${fd(P.src.garmin_export.last_day)}</div></div>
+   </div>
+   <div class="small" style="margin-top:8px">Live source: <b>${esc(live.source||'export only')}</b>${live.source?` (+${live.acts||0} activities, +${live.nights||0} days)`:''}</div>
+   ${errs.map(e=>`<div class="tiny warnc" style="margin-top:4px">Sync problem: ${esc(e)}</div>`).join('')}
+   <div class="row" style="margin-top:10px;gap:8px"><button class="btn" id="sbuild">Update now</button><button class="ghost" id="sreload">Reload data</button></div>
+   <div class="tiny dim" id="srun" style="margin-top:7px">Pull the screen down from the top to reload at any time.</div></div>
+
+  <div class="card set"><h2>Garmin</h2>
+   <div class="small" id="gstat"><span class="dotst" style="background:var(--dim)"></span> checking...</div>
+   <div id="gform" class="hide">
+    <label for="gkey">Personal API key</label>
+    <input id="gkey" type="password" autocomplete="off" spellcheck="false" placeholder="GCDC_...">
+    <label for="gexp">Expires on (Garmin sets it when you create the key)</label>
+    <input id="gexp" type="date">
+    <div class="row" style="margin-top:10px;gap:8px"><button class="btn" id="gsave">Save key</button><button class="ghost danger" id="gdel">Remove</button></div>
+    <div class="hint">The key is encrypted with your passphrase on this phone before it leaves it, and stored in your private repo. The hourly build decrypts it there. Make or renew a key on <a href="https://connect.garmin.com/app/settings/personalApiToken" target="_blank" style="color:var(--swim)">Garmin Connect</a>, then paste it here: no more intervals.icu.</div>
+   </div>
+   <div class="tiny dim" id="gmsg" style="margin-top:7px"></div></div>
+
+  <div class="card set"><h2>GitHub link</h2>
+   <div class="small" id="tstat"></div>
+   <label for="tok">Access token (kept on this phone only)</label>
+   <input id="tok" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_...">
+   <div class="row" style="margin-top:10px;gap:8px"><button class="btn" id="tsave">Save and test</button><button class="ghost danger" id="tdel">Forget</button></div>
+   <div class="hint">Needed so this app can save the Garmin key and ask for a build. Create it at <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" style="color:var(--swim)">github.com fine-grained tokens</a>: pick only the repository <b>${esc(ghRepo().split('/')[1])}</b>, and set permissions <b>Contents: read and write</b> plus <b>Actions: read and write</b>.</div></div>
+
+  <div class="card set"><h2>This app</h2>
+   <div class="row wrap" style="gap:8px"><button class="ghost" id="alock">Lock now</button><button class="ghost" id="aupd">Update the app</button></div>
+   <div class="hint">Lock forgets the key on this phone, so the passphrase is asked again. Update re-downloads the app shell, for when I have changed it.</div>
+   <div class="tiny dim" style="margin-top:8px">Plan ${esc((P.plan&&P.plan.source)||'')} | engine payload v${esc(String(P.v))} | repo ${esc(ghRepo())}</div></div>`;
+}
+AFTER.set=()=>{
+  const gs=$('#gstat'),gm=$('#gmsg'),ts=$('#tstat'),run=$('#srun');
+  const dot=(c,t)=>`<span class="dotst" style="background:${c}"></span> ${t}`;
+  const hasTok=!!ghTok();
+  ts.innerHTML=hasTok?dot('#22c55e','Connected to '+esc(ghRepo())):dot('#f59e0b','Not connected: the two buttons above need it');
+  $('#tok').value='';
+  if(!hasTok){gs.innerHTML=dot('#f59e0b','Connect GitHub below first, then set the Garmin key here.')}
+  else{
+    $('#gform').classList.remove('hide');
+    garminStored().then(g=>{
+      if(!g){gs.innerHTML=dot('#f59e0b','No Garmin key saved: the app only has your export data.');return}
+      if(g.bad){gs.innerHTML=dot('#ef4444','A key is saved but this phone cannot read it: '+esc(g.bad));return}
+      const left=g.expires?Math.round((D(g.expires)-Date.now())/864e5):null;
+      const col=left==null?'#38bdf8':left<0?'#ef4444':left<21?'#f59e0b':'#22c55e';
+      gs.innerHTML=dot(col,`Key saved ${esc((g.saved||'').slice(0,10))}, ending <b>${esc(String(g.key||'').slice(-6))}</b>`+
+        (g.expires?(left<0?` &mdash; <b>expired ${esc(g.expires)}</b>, make a new one`:left<21?` &mdash; expires ${esc(g.expires)}, in ${left} days`:` &mdash; expires ${esc(g.expires)}`):' &mdash; no expiry date noted'));
+      if(g.expires)$('#gexp').value=g.expires;
+    }).catch(e=>{gs.innerHTML=dot('#ef4444',esc(e.message))});
+  }
+  $('#tsave').onclick=async()=>{
+    const t=$('#tok').value.trim(); if(!t)return toast('Paste the token first');
+    localStorage.setItem('ghToken',t);
+    try{const r=await gh(`/repos/${ghRepo()}`);if(!r)throw new Error('Repo not found for this token');toast('GitHub connected');render()}
+    catch(e){localStorage.removeItem('ghToken');ts.innerHTML=dot('#ef4444',esc(e.message))}
+  };
+  $('#tdel').onclick=()=>{localStorage.removeItem('ghToken');toast('Token forgotten');render()};
+  $('#gsave').onclick=async()=>{
+    const k=$('#gkey').value.trim(),exp=$('#gexp').value||null;
+    if(k.length<30)return toast('That does not look like a Garmin key');
+    gm.textContent='Saving (encrypted)...';
+    try{
+      const known=(await lastRun())||{};
+      await garminSave(k,exp);
+      $('#gkey').value='';
+      gm.textContent='Saved. A build has started; the new data lands in a couple of minutes.';
+      toast('Garmin key saved');
+      watchRun(run,known.id);
+      render();
+    }catch(e){gm.innerHTML='<span class="err">'+esc(e.message)+'</span>'}
+  };
+  $('#gdel').onclick=async()=>{
+    if(!confirm('Remove the Garmin key from the repo? The app falls back to the export data.'))return;
+    try{const f=await gh(`/repos/${ghRepo()}/contents/${GKEY}`);
+      if(!f)return toast('There was no key saved');
+      await gh(`/repos/${ghRepo()}/contents/${GKEY}`,{method:'DELETE',body:JSON.stringify({message:'Remove the Garmin key',sha:f.sha})});
+      toast('Key removed');render()}
+    catch(e){gm.innerHTML='<span class="err">'+esc(e.message)+'</span>'}
+  };
+  $('#sbuild').onclick=async()=>{
+    run.textContent='Asking GitHub for a build...';
+    try{const known=(await lastRun())||{};await buildNow();run.textContent='Build requested.';watchRun(run,known.id)}
+    catch(e){run.innerHTML='<span class="err">'+esc(e.message)+'</span>'}
+  };
+  $('#sreload').onclick=()=>refresh();
+  $('#alock').onclick=()=>{if(confirm('Ask for the passphrase next time?')){localStorage.removeItem('coachKey');location.reload()}};
+  $('#aupd').onclick=async()=>{
+    try{if('caches' in window)for(const k of await caches.keys())await caches.delete(k);
+      if(navigator.serviceWorker){for(const r of await navigator.serviceWorker.getRegistrations())await r.unregister()}}
+    catch(e){}
+    location.reload();
+  };
+};
+
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+swipeable();pullToRefresh();
+addEventListener('online',netPill);addEventListener('offline',netPill);
+addEventListener('visibilitychange',()=>{if(!document.hidden&&P&&(Date.now()-new Date(P.built).getTime())>36e5)refresh(true)});
+addEventListener('hashchange',()=>{const t=(location.hash||'').slice(1);if(t&&t!==TAB)go(t)});
+/* in Safari, not installed: say so once */
+if(!window.COACH_DATA&&!matchMedia('(display-mode:standalone)').matches&&!navigator.standalone&&/iPhone|iPad|Android/.test(navigator.userAgent)&&!localStorage.getItem('a2hsHid')){
+  const d=document.createElement('div');d.id='a2hs';
+  d.innerHTML='<span style="flex:1">For the full app: <b>Share</b> then <b>Add to Home Screen</b>.</span><button class="ghost" id="a2hsx">Got it</button>';
+  document.querySelector('header').after(d);
+  d.querySelector('#a2hsx').onclick=()=>{localStorage.setItem('a2hsHid','1');d.remove()};
+}
+boot();
+</script>
+</body>
+</html>
